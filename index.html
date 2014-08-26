@@ -18,20 +18,23 @@
 		</style>
 		<script type="text/javascript">
 
-      var _gaq = _gaq || [];
+/*      var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-32642923-1']);
       _gaq.push(['_trackPageview']);
 
       (function() {
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
+      })();*/
 
     </script>
 	</head>
 	<body>
 		<script src="./js/headtrackr.js"></script>
+		<script src="./js/dsp.js"></script>
+		<script src="./js/cbuffer.js"></script>
+		<script src="./js/Chart.js"></script>
 
 		<canvas id="compare" width="320" height="240" style="display:none"></canvas>
 		<video id="vid" autoplay loop width="320" height="240"></video>
@@ -75,6 +78,12 @@
 			debugOverlay.style.display = 'none';
 			
 			var GrnAverage;
+			var start = Date.now();
+
+			var bufferSize = 256;
+			var sampleRate = 25;
+			var fft = new FFT(bufferSize,sampleRate);
+			var cbuffer = new CBuffer(bufferSize);
 
 			// add some custom messaging
 			
@@ -105,7 +114,7 @@
 			
 			// the face tracking setup
 			
-			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay});
+			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 10});
 			htracker.init(videoInput, canvasInput);
 			htracker.start();
 			
@@ -125,6 +134,8 @@
 					overlayContext.rotate((Math.PI/2)-event.angle);
 					overlayContext.translate(-event.x, -event.y);
 					
+
+
 
 					// x,y for centre; X,Y for top corner
 
@@ -196,8 +207,26 @@
 					testOverlayContext.rotate((Math.PI/2)-event.angle);
 					testOverlayContext.translate(-event.x, -event.y);
 
-*/
+*/				
 
+					//Now let's get some timing information.
+					var end = Date.now();
+					var deltaT = end - start;
+
+					console.log("deltaT = %d",deltaT);
+
+					start = Date.now();
+
+					console.log("GrnAverage = %d",GrnAverage);
+					//Spectrum
+
+					//FFT Stuff
+					cbuffer.push(GrnAverage);
+
+					fft.forward(cbuffer.data);
+
+					var spectrum = fft.spectrum;
+					console.log("fft.real[0] = %d",fft.real[0]);
 				}
 			});
 			
