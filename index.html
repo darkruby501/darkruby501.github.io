@@ -22,6 +22,7 @@
 		<script src="./js/dsp.js"></script>
 		<script src="./js/cbuffer.js"></script>
 		<script src="./js/Chart.js"></script>
+		<script src="./js/pulsedetectr.js"></script>
 
 		<canvas id="compare" width="320" height="240" style="display:none"></canvas>
 		<video id="vid" autoplay loop width="320" height="240"></video>
@@ -47,13 +48,11 @@
 			var canvasOverlay = document.getElementById('overlay');
 			var debugOverlay = document.getElementById('debug');
 			var overlayContext = canvasOverlay.getContext('2d');
+			/*var inputContext = canvasInput.getContext('2d'); //added to access video canvas*/
 
-			var inputContext = canvasInput.getContext('2d'); //added to access video canvas
-
-			//Varibles for test canvas.
+			//Varibles for pulsedetectr canvas.
 			var testOverlay = document.getElementById('test_canvas');
-			var testOverlayContext = testOverlay.getContext('2d');
-
+/*			var testOverlayContext = testOverlay.getContext('2d');*/
 
 			canvasOverlay.style.position = "absolute";
 			canvasOverlay.style.top = '0px';
@@ -64,13 +63,7 @@
 			debugOverlay.style.zIndex = '100002';
 			debugOverlay.style.display = 'none';
 			
-			var GrnAverage;
-			var start = Date.now();
-
-			var bufferSize = 256;
-			var sampleRate = 25;
-			var fft = new FFT(bufferSize,sampleRate);
-			var cbuffer = new CBuffer(bufferSize);
+			
 
 			// add some custom messaging
 			
@@ -104,13 +97,19 @@
 			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 10});
 			htracker.init(videoInput, canvasInput);
 			htracker.start();
+
+
+			var pdetector = new pulsedetectr.Detector();
+			pdetector.init(canvasInput,testOverlay,canvasOverlay);
+
+
 			
 			// for each facetracking event received draw rectangle around tracked face on canvas
 			
 			document.addEventListener("facetrackingEvent", function( event ) {
 				// clear canvas
 				overlayContext.clearRect(0,0,320,240);
-				testOverlayContext.clearRect(0,0,320,240);
+
 
 				// once we have stable tracking, draw rectangle
 				if (event.detection == "CS") {
@@ -122,98 +121,12 @@
 					overlayContext.translate(-event.x, -event.y);
 					
 
+					pdetector.run();
 
-
-					// x,y for centre; X,Y for top corner
-
-					//Isolate Sub-Image and draw
-					var subimgw = event.width;
-					var subimgh = event.height;
-					var subimgX = (event.x - event.width/2) >> 0;
-					var subimgY = (event.y - event.height/2) >> 0;
-
-					//Offsets and multiplacative scalings for forehead
-
-					//var fh_x = 1
-					var fh_y = 0.18, //location multiplacative offset thingo
-					fh_w = 0.25, //size of forehead relative to face - 25% width
-					fh_h = 0.20; // 15% height
-					fh_u = 0.25; //proportion of face up from cetre to forehead
-					var ForeHead_h = event.width*fh_h;
-					var ForeHead_w = event.height*fh_w;
-
-					var ForeHead_x = event.x; //same x location
-					var ForeHead_y = event.y - event.height*fh_u;
-					var ForeHead_X = (ForeHead_x - ForeHead_w/2) >> 0;
-					var ForeHead_Y = (ForeHead_y - ForeHead_h/2) >> 0;
-
-				
-					var subImage = inputContext.getImageData(subimgX,subimgY,subimgw,subimgh);
-					testOverlayContext.putImageData(subImage,subimgX,subimgY);
-
-					var ForeHeadImage = inputContext.getImageData(ForeHead_X,ForeHead_Y,ForeHead_w,ForeHead_h);
-					testOverlayContext.putImageData(ForeHeadImage,10,10);
-
-					//Draw Rectangle around forehead.
-					overlayContext.strokeStyle = "#00CC00";
-					overlayContext.strokeRect(ForeHead_X,ForeHead_Y,ForeHead_w,ForeHead_h);
-
-					testOverlayContext.strokeStyle = "#00CC00";
-					testOverlayContext.strokeRect(ForeHead_X,ForeHead_Y,ForeHead_w,ForeHead_h);
-
-					//Now get green channel
-					var dst = ForeHeadImage.data;
-					var GreenChannelFH = [];
-					var GrnSum = 0;
-					// var GrnCount = 0;
-
-					/* Image Processing goes here */
-					for (var i=0; i < dst.length; i += 4) {
-						dst[i+0] = 0;
-						dst[i+2] = 0;
-
-						GreenChannelFH[(i/4)>>0] = dst[i+1];
-						GrnSum += dst[i+1];						
-					}
 					
-					GrnAverage = Math.round(GrnSum/GreenChannelFH.length);
-
-					ForeHeadImage.data = dst;
-										
-					testOverlayContext.putImageData(ForeHeadImage,10,50);
-
 
 					var messagep = document.getElementById('GrnAverageValue');
-					messagep.innerHTML = GrnAverage;
-
-/*					//Insert code to have detected face on test_canvas
-					testOverlayContext.translate(event.x, event.y)
-					testOverlayContext.rotate(event.angle-(Math.PI/2));
-					testOverlayContext.strokeStyle = "#00CC00";
-					testOverlayContext.strokeRect((-(event.width/2)) >> 0, (-(event.height/2)) >> 0, event.width, event.height);
-					testOverlayContext.rotate((Math.PI/2)-event.angle);
-					testOverlayContext.translate(-event.x, -event.y);
-
-*/				
-
-					//Now let's get some timing information.
-					var end = Date.now();
-					var deltaT = end - start;
-
-					console.log("deltaT = %d",deltaT);
-
-					start = Date.now();
-
-					console.log("GrnAverage = %d",GrnAverage);
-					//Spectrum
-
-					//FFT Stuff
-					cbuffer.push(GrnAverage);
-
-					fft.forward(cbuffer.data);
-
-					var spectrum = fft.spectrum;
-					console.log("fft.real[0] = %d",fft.real[0]);
+					messagep.innerHTML = pdetector.GrnAverage;
 				}
 			});
 			
