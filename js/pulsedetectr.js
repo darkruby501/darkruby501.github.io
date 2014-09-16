@@ -37,21 +37,23 @@ pulsedetectr = {};
 
 	if (!params) params = {}; /* never know when you're going to need params */
 
-	var iCanvasContext, oCanvasContext, oCanvas2Context;
+	var iCanvasContext, oCanvasContext, oCanvas2Context,oChartCanvasCtx;
 
 
 	var fft = {};
 	var cbuffer = {};
+	var myChart = {};
 	var Head_Image = {};
 	var FH_image = {};
 	var HeadPos = {};
+	var PlotData = {};
 	
 				var start = Date.now();
 
 	this.GrnAverage = {};
 
 	
-	this.init = function(iCanvas,oCanvas,oCanvas2,params){
+	this.init = function(iCanvas,oCanvas,oCanvas2,oChartCanvas,params){
 		if (!params) params = {};
 
 		if(params.bufferSize === undefined) params.bufferSize = 256;
@@ -60,11 +62,22 @@ pulsedetectr = {};
 
 		iCanvasContext = iCanvas.getContext('2d');
 		oCanvasContext = oCanvas.getContext('2d');
-		oCanvas2Context = oCanvas.getContext('2d');
+		oCanvas2Context = oCanvas2.getContext('2d');
+		oChartCanvasCtx = oChartCanvas.getContext('2d');
 
 		fft = new FFT(params.bufferSize,params.sampleRate);
 		cbuffer = new CBuffer(params.bufferSize);
 
+		
+		PlotData.labels = range(0,params.bufferSize);
+		PlotData.datasets = [];
+		PlotData.datasets[0] = {	
+									label: "test label",
+									fillColor: "rgba(0,0,0,0)",
+									data: cbuffer.data //data: PlotData.labels //
+								};
+
+		myChart = new Chart(oChartCanvasCtx).Line(PlotData);
 
 
 	}
@@ -76,10 +89,15 @@ pulsedetectr = {};
 		green_process();
 		draw(HeadPos);
 
+		cbuffer.push(GrnAverage);
 
 	}
 
 
+	this.updatePlot = function(){
+		myChart.datasets[0].data = cbuffer.data;
+		myChart.update();
+	}
 	
 
 	forhead_extract = function(){
@@ -158,6 +176,27 @@ pulsedetectr = {};
 
 
 
+/*var plot = function(context,data){
 
 
 
+
+
+
+
+
+}*/
+
+
+function range(start, count) {
+    if(arguments.length == 1) {
+        count = start;
+        start = 0;
+    }
+
+    var foo = [];
+    for (var i = 0; i < count; i++) {
+        foo.push(start + i);
+    }
+    return foo;
+}

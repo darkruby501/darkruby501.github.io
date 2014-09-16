@@ -28,6 +28,7 @@
 		<video id="vid" autoplay loop width="320" height="240"></video>
 		<canvas id="overlay" width="320" height="240"></canvas>
 		<canvas id="debug" width="320" height="240"></canvas>
+		<canvas id="chart" width="320" height="240"></canvas>
 		
 
 		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
@@ -39,6 +40,7 @@
 		<p><input type="button" onclick="htracker.stop();htracker.start();" value="reinitiate facedetection"></input>
 		<br/><br/>
 		<input type="checkbox" onclick="showProbabilityCanvas()" value="asdfasd"></input>Show probability-map</p>
+		<input type="button" onclick="pdetector.updatePlot()" value="aoeuaoeu"></input>Update Plot</p>
 		
 		<script>
 		  // set up video and canvas elements needed
@@ -47,6 +49,7 @@
 			var canvasInput = document.getElementById('compare');
 			var canvasOverlay = document.getElementById('overlay');
 			var debugOverlay = document.getElementById('debug');
+			var chartCanvas = document.getElementById('chart');
 			var overlayContext = canvasOverlay.getContext('2d');
 			/*var inputContext = canvasInput.getContext('2d'); //added to access video canvas*/
 
@@ -100,7 +103,7 @@
 
 
 			var pdetector = new pulsedetectr.Detector();
-			pdetector.init(canvasInput,testOverlay,canvasOverlay);
+			pdetector.init(canvasInput,testOverlay,canvasOverlay,chartCanvas);
 
 
 			
