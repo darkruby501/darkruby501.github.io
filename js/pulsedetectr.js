@@ -47,15 +47,15 @@ pulsedetectr = {};
 
 	var iCanvasContext, oCanvasContext, oCanvas2Context,oChartCanvasCtx; //uneeded variable here . . .
 
+//Okay, R eally gotta tidy these variables!!!!
 
 	var start = Date.now(); //used to get timing info
 	var fft = {};
-	var cbuffer = {};
+	var Values = {};
 	var myChart = {};
 	var Head_Image = {};
 	var FH_image = {};
 	var HeadPos = {};
-	var PlotData = {};
 	var ppg_data = {};
 	
 	
@@ -80,7 +80,8 @@ pulsedetectr = {};
 		timer1 = new this.timer;
 		timer1.init();
 		fft = new FFT(params.bufferSize,params.sampleRate);
-		cbuffer = new CBuffer(params.bufferSize);
+		Values.t = new CBuffer(params.bufferSize);
+		Values.Y = new CBuffer(params.bufferSize);
 
 		
 		/*PlotData.labels = range(0,params.bufferSize);
@@ -102,24 +103,68 @@ pulsedetectr = {};
 
 	this.run = function(event){
 
+		var processed = {};
+		
 		timer1.printnreset();
 		HeadPos = forhead_extract();
 		green_process();
 		draw(HeadPos);
 
-		ppg_data.append(new Date().getTime(), GrnAverage);
+		var timenow = new Date().getTime();
+		ppg_data.append(timenow, GrnAverage);
+/*		Values.t.push(timenow);
+		Values.Y.push(GrnAverage);
+*/
 
-		//cbuffer.push(GrnAverage);
+		// var getpulse = function(){
+
+		// //Linear interpolate values.
+		// if(Values.t.data.length > bufferSize - 1){
+		// 	return;
+		// }
+		// else{
+		// //Linear interpolate values.
+		// 	var tmp = lerp(Values.t.data,Values.Y.data)
+		// 	Values.even_t = tmp.X;
+		// 	Values.even_Y = tmp.Y;
+		// 	Values.mean = tmp.mean;
+
+		
+
+		// 	fft.SAMPLERATE = (Values.t.data[bufferSize-1]-Values.t.data[0])/bufferSize;
+
+
+		// 	for(var i=0;i<bufferSize;i++){
+		// 	Values.Ylessmean[i] = Values.even_Y[i] - Values.mean; 
+		// 	}
+			
+		// 	//Run FFT
+		// 	Values.Spectrum = fft.forward(Values.Ylessmean);
+
+		// 	//Now need to plot spectum!!!
+		// }
+
+		// }
+
+	// this.plotSpectrum = function(canvas){
+
+	// //canvas.linechart(0,0,640,480,Values.)
+
+	// }
+	
+
 
 	}
 
 
-	this.updatePlot = function(){
 
 
-	/*	myChart.datasets[0].data = cbuffer.data;
-		myChart.update();*/
-	}
+	// this.updatePlot = function(){
+
+
+	// 	myChart.datasets[0].data = cbuffer.data;
+	// 	myChart.update();
+	// }
 	
 
 	forhead_extract = function(){
@@ -219,27 +264,82 @@ pulsedetectr = {};
 
 
 
-/*var plot = function(context,data){
+
+
+
+
+// function range(start, count) {
+//     if(arguments.length == 1) {
+//         count = start;
+//         start = 0;
+//     }
+
+//     var foo = [];
+//     for (var i = 0; i < count; i++) {
+//         foo.push(start + i);
+//     }
+//     return foo;
+// }
+
+// //linspace.js Generate linearly spaced vectors
+// //Helena F. Deus (helenadeus@gmail.com)
+// //200809
+
+
+
+// function lerp(x,y){
+//  	/*x and y must be arrays.
+
+// 	x is input time, y is input values;
+// 	Interp
+	
+// 	Interp.X are linearly spaced times.
+// 	Interp.Y are interpolated values at linearly spaced times.
+
+// 	Also returns mean of Y.
+
+//  	*/
+//  	var Interp = {};
+//  	var sum = 0;
+
+//  	if (x.length != y.length){
+//  		console.error("lerp vectors are not of same size!")
+//  	}
+ 	
+//  	 	N = x.length;
+
+//  	Interp.X = linspace(x[0],x[N-1],N);
+
+//  	for (var i = 0; i < N; i++){
+//  		Interp.Y[i] = y[i] + (y[i+1]-y[i])*((X[i]-x[i])/(x[i+1]-x[i]));
+//  		sum += Y[i];
+//   	}
+
+//   	Interp.mean = sum/N;
+
+//   	return Interp;
+
+// 	function linspace(d1,d2,n) {
+	                
+// 	        j=0;
+// 	        var L = new Array();
+	        
+// 	        while (j<=(n-1)) {
+	        
+// 	                var tmp1 = j*(d2-d1)/(Math.floor(n)-1);
+// 	                var tmp2 = Math.ceil((d1+tmp1)*10000)/10000;
+// 	                L.push(tmp2);
+// 	                j=j+1;
+// 	        }
+	        
+// 	        return L;
+// 	 }
+
+// }
 
 
 
 
 
 
-
-
-}*/
-
-
-function range(start, count) {
-    if(arguments.length == 1) {
-        count = start;
-        start = 0;
-    }
-
-    var foo = [];
-    for (var i = 0; i < count; i++) {
-        foo.push(start + i);
-    }
-    return foo;
-}
+ 

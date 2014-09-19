@@ -21,19 +21,25 @@
 		<script src="./js/headtrackr.js"></script>
 		<script src="./js/dsp.js"></script>
 		<script src="./js/cbuffer.js"></script>
-		<script src="./js/Chart.js"></script>
-		<script src="./js/pulsedetectr.js"></script>
+<!-- 		<script src="./js/Chart.js"></script>
+ -->		
+ 		<script src="./js/pulsedetectr.js"></script>
 		<script src="./js/smoothie.js"></script>
 
+		<script src="./js/raphael-min.js"></script>
+		<script src="./js/g.raphael-min.js"></script>
+		<script src="./js/g.line-min.js"></script>
 
-		<canvas id="compare" width="640" height="480" style="display:none"></canvas>
-		<video id="vid" autoplay loop width="640" height="480"></video>
-		<canvas id="overlay" width="640" height="480"></canvas>
-		<canvas id="debug" width="640" height="480"></canvas>
+
+		<canvas id="compare" width="320" height="240" style="display:none"></canvas>
+		<video id="vid" autoplay loop width="320" height="240"></video>
+		<canvas id="overlay" width="320" height="240"></canvas>
+		<canvas id="debug" width="320" height="240"></canvas>
 		<canvas id="chart" width="320" height="80"></canvas> <!-- For real-time plot-->
-		
+<!-- 		<canvas id="spectrum" width="640" height="480"></canvas> <!-- For real-time plot-->
+ -->		
 
-		<canvas id="test_canvas" width=640 height=480></canvas> <!-- New canvas for testing	 -->
+		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
 
 
 		<p id='gUMMessage'></p>
@@ -47,6 +53,7 @@
 		<script>
 		  // set up video and canvas elements needed
 		
+			var spectrumCanvas = document.getElementById('spectrum');
 			var videoInput = document.getElementById('vid');
 			var canvasInput = document.getElementById('compare');
 			var canvasOverlay = document.getElementById('overlay');
@@ -113,7 +120,7 @@
 			
 			document.addEventListener("facetrackingEvent", function( event ) {
 				// clear canvas
-				overlayContext.clearRect(0,0,640,480);
+				overlayContext.clearRect(0,0,320,240);
 
 
 				// once we have stable tracking, draw rectangle
@@ -133,6 +140,8 @@
 					messagep.innerHTML = new Date().getMilliseconds(); //pdetector.GrnAverage;
 				}
 			});
+
+		//	setInterval(pdetector.plotSpectrum(spectrumCanvas), 5000);
 			
 			// turn off or on the canvas showing probability
 			function showProbabilityCanvas() {

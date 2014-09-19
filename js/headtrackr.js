@@ -193,9 +193,9 @@ headtrackr.Tracker = function(params) {
 			// resize video when it is playing
 			video.addEventListener('playing', function() {
 				if(video.width > video.height) {
-					video.width = 640;
+					video.width = 320;
 				} else {
-					video.height = 480;
+					video.height = 240;
 				}
 			}, false);
 		}
@@ -1663,7 +1663,7 @@ headtrackr.Ui = function() {
  *   based on input from facetrackrObject
  *
  * Usage:
- *	var hp = new headtrackr.headposition.Tracker(facetrackrObject, 640, 480);
+ *	var hp = new headtrackr.headposition.Tracker(facetrackrObject, 320, 240);
  *	var currentPosition = hp.track(facetrackrObject);
  *
  * @author auduno / github.com/auduno
@@ -1680,7 +1680,7 @@ headtrackr.headposition = {};
  *	camheight : height of canvas where the face was detected
  *
  * Optional parameters can be passed along like this:
- *	 headtrackr.headposition.Tracker(facetrackrObject, 640, 480, {fov : 60})
+ *	 headtrackr.headposition.Tracker(facetrackrObject, 320, 240, {fov : 60})
  *
  * Optional parameters:
  *	 fov {number} : horizontal field of view of camera (default is to detect via distance to screen, any fov overrides distance_to_screen)
