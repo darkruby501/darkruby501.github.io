@@ -156,7 +156,7 @@ pulsedetectr = {};
 	}
 
 	var draw = function(hp){
-		oCanvasContext.clearRect(0,0,320,240);
+		oCanvasContext.clearRect(0,0,640,480);
 
 		oCanvasContext.putImageData(Head_Image,hp.subimgX,hp.subimgY); /*Place sub image of head on canvas*/
 		oCanvasContext.putImageData(FH_image,10,10); /*Place sub image of forehead in corner of the canvas*/

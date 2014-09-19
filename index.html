@@ -24,14 +24,14 @@
 		<script src="./js/Chart.js"></script>
 		<script src="./js/pulsedetectr.js"></script>
 
-		<canvas id="compare" width="320" height="240" style="display:none"></canvas>
-		<video id="vid" autoplay loop width="320" height="240"></video>
-		<canvas id="overlay" width="320" height="240"></canvas>
-		<canvas id="debug" width="320" height="240"></canvas>
-		<canvas id="chart" width="320" height="240"></canvas>
+		<canvas id="compare" width="640" height="480" style="display:none"></canvas>
+		<video id="vid" autoplay loop width="640" height="480"></video>
+		<canvas id="overlay" width="640" height="480"></canvas>
+		<canvas id="debug" width="640" height="480"></canvas>
+		<canvas id="chart" width="640" height="480"></canvas>
 		
 
-		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
+		<canvas id="test_canvas" width=640 height=480></canvas> <!-- New canvas for testing	 -->
 
 
 		<p id='gUMMessage'></p>
@@ -111,7 +111,7 @@
 			
 			document.addEventListener("facetrackingEvent", function( event ) {
 				// clear canvas
-				overlayContext.clearRect(0,0,320,240);
+				overlayContext.clearRect(0,0,640,480);
 
 
 				// once we have stable tracking, draw rectangle
