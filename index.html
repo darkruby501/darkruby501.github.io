@@ -23,12 +23,14 @@
 		<script src="./js/cbuffer.js"></script>
 		<script src="./js/Chart.js"></script>
 		<script src="./js/pulsedetectr.js"></script>
+		<script src="./js/smoothie.js"></script>
+
 
 		<canvas id="compare" width="640" height="480" style="display:none"></canvas>
 		<video id="vid" autoplay loop width="640" height="480"></video>
 		<canvas id="overlay" width="640" height="480"></canvas>
 		<canvas id="debug" width="640" height="480"></canvas>
-		<canvas id="chart" width="640" height="480"></canvas>
+		<canvas id="chart" width="320" height="80"></canvas> <!-- For real-time plot-->
 		
 
 		<canvas id="test_canvas" width=640 height=480></canvas> <!-- New canvas for testing	 -->
@@ -127,9 +129,8 @@
 					pdetector.run();
 
 					
-
 					var messagep = document.getElementById('GrnAverageValue');
-					messagep.innerHTML = pdetector.GrnAverage;
+					messagep.innerHTML = new Date().getMilliseconds(); //pdetector.GrnAverage;
 				}
 			});
 			

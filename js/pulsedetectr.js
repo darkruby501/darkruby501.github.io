@@ -25,6 +25,14 @@ Headtrackr library has this at the beginning - I do not yet understand why . . .
 */
 
 
+/*TODO*/
+
+//Need to fix hardcoding of video size (one variable in index file + argument checking in libraries?)
+//At least change so that forehead capture rotates with head.
+//Likely need to move to solely face recognition, no object tracking.
+
+
+
  (function(){
 
 
@@ -37,9 +45,10 @@ pulsedetectr = {};
 
 	if (!params) params = {}; /* never know when you're going to need params */
 
-	var iCanvasContext, oCanvasContext, oCanvas2Context,oChartCanvasCtx;
+	var iCanvasContext, oCanvasContext, oCanvas2Context,oChartCanvasCtx; //uneeded variable here . . .
 
 
+	var start = Date.now(); //used to get timing info
 	var fft = {};
 	var cbuffer = {};
 	var myChart = {};
@@ -47,56 +56,69 @@ pulsedetectr = {};
 	var FH_image = {};
 	var HeadPos = {};
 	var PlotData = {};
+	var ppg_data = {};
 	
-				var start = Date.now();
-
+	
 	this.GrnAverage = {};
 
+			
 	
-	this.init = function(iCanvas,oCanvas,oCanvas2,oChartCanvas,params){
+	
+	this.init = function(iCanvas,oCanvas,oCanvas2,oChart,params){
 		if (!params) params = {};
 
 		if(params.bufferSize === undefined) params.bufferSize = 256;
 		if(params.sampleRate === undefined) params.sampleRate = 25;
 
+		
 
 		iCanvasContext = iCanvas.getContext('2d');
 		oCanvasContext = oCanvas.getContext('2d');
 		oCanvas2Context = oCanvas2.getContext('2d');
-		oChartCanvasCtx = oChartCanvas.getContext('2d');
+		//oChartCanvasCtx = oChart.getContext('2d');
 
+		timer1 = new this.timer;
+		timer1.init();
 		fft = new FFT(params.bufferSize,params.sampleRate);
 		cbuffer = new CBuffer(params.bufferSize);
 
 		
-		PlotData.labels = range(0,params.bufferSize);
+		/*PlotData.labels = range(0,params.bufferSize);
 		PlotData.datasets = [];
 		PlotData.datasets[0] = {	
 									label: "test label",
 									fillColor: "rgba(0,0,0,0)",
 									data: cbuffer.data //data: PlotData.labels //
-								};
+								};*/
 
-		myChart = new Chart(oChartCanvasCtx).Line(PlotData);
+		myChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:1,timestampFormatter:SmoothieChart.timeFormatter});
+		myChart.streamTo(oChart,500);
 
+		ppg_data = new TimeSeries();
+		myChart.addTimeSeries(ppg_data, {lineWidth:2,strokeStyle:'#00ff00'})
 
 	}
 
 
 	this.run = function(event){
 
+		timer1.printnreset();
 		HeadPos = forhead_extract();
 		green_process();
 		draw(HeadPos);
 
-		cbuffer.push(GrnAverage);
+		ppg_data.append(new Date().getTime(), GrnAverage);
+
+		//cbuffer.push(GrnAverage);
 
 	}
 
 
 	this.updatePlot = function(){
-		myChart.datasets[0].data = cbuffer.data;
-		myChart.update();
+
+
+	/*	myChart.datasets[0].data = cbuffer.data;
+		myChart.update();*/
 	}
 	
 
@@ -170,7 +192,28 @@ pulsedetectr = {};
 
 	}
 
+
+	this.timer = function(){
+			
+			var start, end, deltaT;
+		
+			this.init = function(){
+				start = Date.now();	
+			}
+
+			this.printnreset = function(){
+				end = Date.now();
+				deltaT = end - start;
+				console.log("deltaT = %d",deltaT);
+				start = end;
+			}
+
+			return this;
+		}
+
 }
+
+
 
 }());
 
