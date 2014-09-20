@@ -58,7 +58,7 @@ pulsedetectr = {};
 	var HeadPos = {};
 	var ppg_data = {};
 	
-	
+	this.initialised = false;	
 	this.GrnAverage = {};
 
 			
@@ -83,27 +83,20 @@ pulsedetectr = {};
 		Values.t = new CBuffer(params.bufferSize);
 		Values.Y = new CBuffer(params.bufferSize);
 
-		
-		/*PlotData.labels = range(0,params.bufferSize);
-		PlotData.datasets = [];
-		PlotData.datasets[0] = {	
-									label: "test label",
-									fillColor: "rgba(0,0,0,0)",
-									data: cbuffer.data //data: PlotData.labels //
-								};*/
-
 		myChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:1,timestampFormatter:SmoothieChart.timeFormatter});
 		myChart.streamTo(oChart,500);
 
 		ppg_data = new TimeSeries();
 		myChart.addTimeSeries(ppg_data, {lineWidth:2,strokeStyle:'#00ff00'})
 
+		this.initialised = true;
 	}
 
 
 	this.run = function(event){
 
 		var processed = {};
+		var buffer_full = false;
 		
 		timer1.printnreset();
 		HeadPos = forhead_extract();
@@ -112,49 +105,57 @@ pulsedetectr = {};
 
 		var timenow = new Date().getTime();
 		ppg_data.append(timenow, GrnAverage);
-/*		Values.t.push(timenow);
+		Values.t.push(timenow);
 		Values.Y.push(GrnAverage);
-*/
-
-		// var getpulse = function(){
-
-		// //Linear interpolate values.
-		// if(Values.t.data.length > bufferSize - 1){
-		// 	return;
-		// }
-		// else{
-		// //Linear interpolate values.
-		// 	var tmp = lerp(Values.t.data,Values.Y.data)
-		// 	Values.even_t = tmp.X;
-		// 	Values.even_Y = tmp.Y;
-		// 	Values.mean = tmp.mean;
-
-		
-
-		// 	fft.SAMPLERATE = (Values.t.data[bufferSize-1]-Values.t.data[0])/bufferSize;
 
 
-		// 	for(var i=0;i<bufferSize;i++){
-		// 	Values.Ylessmean[i] = Values.even_Y[i] - Values.mean; 
-		// 	}
-			
-		// 	//Run FFT
-		// 	Values.Spectrum = fft.forward(Values.Ylessmean);
+/*	this.plotSpectrum = function(canvas){
 
-		// 	//Now need to plot spectum!!!
-		// }
+	//canvas.linechart(0,0,640,480,Values.)
 
-		// }
-
-	// this.plotSpectrum = function(canvas){
-
-	// //canvas.linechart(0,0,640,480,Values.)
-
-	// }
+	}*/
 	
 
 
 	}
+
+	this.getpulse = function(){
+
+		if(this.initialised==true){
+		var bufferSize = Values.Y.length;
+
+
+		//Linear interpolate values.
+		if(ppg_data.data.length < bufferSize){
+			buffer_full = false;
+			return;
+		}
+		else{
+			buffer_full = true;
+		//Linear interpolate values.
+			var tmp = lerp(Values.t.data,Values.Y.data);
+			Values.even_t = tmp.X;
+			Values.even_Y = tmp.Y;
+			Values.mean = tmp.mean;
+
+		
+
+			fft.SAMPLERATE = (Values.t.data[bufferSize-1]-Values.t.data[0])/bufferSize;
+
+			Values.Ylessmean = [];
+
+			for(var i=0;i<bufferSize;i++){
+			Values.Ylessmean[i] = Values.even_Y[i] - Values.mean; 
+			}
+			
+			//Run FFT
+			Values.Spectrum = fft.forward(Values.Ylessmean);
+
+			//Now need to plot spectum!!!
+		}
+
+	}
+}	
 
 
 
@@ -287,55 +288,57 @@ pulsedetectr = {};
 
 
 
-// function lerp(x,y){
-//  	/*x and y must be arrays.
+function lerp(x,y){
+ 	/*x and y must be arrays.
 
-// 	x is input time, y is input values;
-// 	Interp
+	x is input time, y is input values;
+	Interp
 	
-// 	Interp.X are linearly spaced times.
-// 	Interp.Y are interpolated values at linearly spaced times.
+	Interp.X are linearly spaced times.
+	Interp.Y are interpolated values at linearly spaced times.
 
-// 	Also returns mean of Y.
+	Also returns mean of Y.
 
-//  	*/
-//  	var Interp = {};
-//  	var sum = 0;
-
-//  	if (x.length != y.length){
-//  		console.error("lerp vectors are not of same size!")
-//  	}
+ 	*/
  	
-//  	 	N = x.length;
+ 	if (x.length != y.length){
+ 		console.error("lerp vectors are not of same size!")
+ 	}
+ 	
+ 	var Interp = {};
+ 	var sum = 0;
+ 	var N = x.length;
+	
 
-//  	Interp.X = linspace(x[0],x[N-1],N);
+ 	Interp.X = linspace(x[0],x[N-1],N);
+ 	Interp.Y = [];
 
-//  	for (var i = 0; i < N; i++){
-//  		Interp.Y[i] = y[i] + (y[i+1]-y[i])*((X[i]-x[i])/(x[i+1]-x[i]));
-//  		sum += Y[i];
-//   	}
+ 	for (var i = 0; i < N-1; i++){
+ 		Interp.Y[i] = y[i] + (y[i+1]-y[i])*((Interp.X[i]-x[i])/(x[i+1]-x[i]));
+ 		sum += Interp.Y[i];
+  	}
 
-//   	Interp.mean = sum/N;
+  	Interp.mean = Math.round(sum/N);
 
-//   	return Interp;
+  	return Interp;
 
-// 	function linspace(d1,d2,n) {
+	function linspace(d1,d2,n) {
 	                
-// 	        j=0;
-// 	        var L = new Array();
+	        j=0;
+	        var L = new Array();
 	        
-// 	        while (j<=(n-1)) {
+	        while (j<=(n-1)) {
 	        
-// 	                var tmp1 = j*(d2-d1)/(Math.floor(n)-1);
-// 	                var tmp2 = Math.ceil((d1+tmp1)*10000)/10000;
-// 	                L.push(tmp2);
-// 	                j=j+1;
-// 	        }
+	                var tmp1 = j*(d2-d1)/(Math.floor(n)-1);
+	                var tmp2 = Math.ceil((d1+tmp1)*10000)/10000;
+	                L.push(tmp2);
+	                j=j+1;
+	        }
 	        
-// 	        return L;
-// 	 }
+	        return L;
+	 }
 
-// }
+}
 
 
 
