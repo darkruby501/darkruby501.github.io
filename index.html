@@ -20,7 +20,6 @@
 	<body>
 		<script src="./js/headtrackr.js"></script>
 		<script src="./js/dsp.js"></script>
-		<script src="./js/cbuffer.js"></script>
  		<script src="./js/pulsedetectr.js"></script>
 		<script src="./js/smoothie.js"></script>
 		<script src="./js/raphael-min.js"></script>
@@ -33,7 +32,7 @@
 		<canvas id="overlay" width="320" height="240"></canvas>
 		<canvas id="debug" width="320" height="240"></canvas>
 		<canvas id="chart" width="320" height="80"></canvas> <!-- For real-time plot-->
-		<canvas id="spectrum" width="320" height="240"></canvas>
+	<!-- 	<canvas id="spectrum" width="320" height="240"></canvas> -->
  	
 
 		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
@@ -45,12 +44,13 @@
 		<p><input type="button" onclick="htracker.stop();htracker.start();" value="reinitiate facedetection"></input>
 		<br/><br/>
 		<input type="checkbox" onclick="showProbabilityCanvas()" value="asdfasd"></input>Show probability-map</p>
-		<input type="button" onclick="pdetector.updatePlot()" value="aoeuaoeu"></input>Update Plot</p>
+	
 		
 		<script>
 		  // set up video and canvas elements needed
-		
-			var spectrumCanvas = document.getElementById('spectrum');
+			var spectrumCanvas = Raphael(325, 0, 320, 150);
+
+			//var spectrumCanvas = document.getElementById('spectrum');
 			var videoInput = document.getElementById('vid');
 			var canvasInput = document.getElementById('compare');
 			var canvasOverlay = document.getElementById('overlay');
@@ -103,13 +103,13 @@
 			
 			// the face tracking setup
 			
-			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 10});
+			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 50});
 			htracker.init(videoInput, canvasInput);
 			htracker.start();
 
 
 			var pdetector = new pulsedetectr.Detector();
-			pdetector.init(canvasInput,testOverlay,canvasOverlay,chartCanvas);
+			pdetector.init(canvasInput,testOverlay,canvasOverlay,chartCanvas,{bufferSize: 128});
 
 
 			
@@ -130,11 +130,11 @@
 					overlayContext.translate(-event.x, -event.y);
 					
 
-					pdetector.run();
+					pdetector.run(event);
 
 					
 					var messagep = document.getElementById('GrnAverageValue');
-					messagep.innerHTML = new Date().getMilliseconds(); //pdetector.GrnAverage;
+					messagep.innerHTML = pdetector.GrnAverage;
 				}
 			});
 
@@ -142,7 +142,7 @@
 				if(pdetector.initialised==true){
 						pdetector.getpulse()
 					}
-				}, 1000); 
+				}, 500); 
 
 				//	pdetector.plotSpectrum(spectrumCanvas)
 			

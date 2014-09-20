@@ -50,16 +50,17 @@ pulsedetectr = {};
 //Okay, R eally gotta tidy these variables!!!!
 
 	var start = Date.now(); //used to get timing info
-	var fft = {};
+	var rfft = {};
 	var Values = {};
 	var myChart = {};
 	var Head_Image = {};
 	var FH_image = {};
 	var HeadPos = {};
 	var ppg_data = {};
+	var bufferSize;
 	
 	this.initialised = false;	
-	this.GrnAverage = {};
+	this.GrnAverage;
 
 			
 	
@@ -70,6 +71,7 @@ pulsedetectr = {};
 		if(params.bufferSize === undefined) params.bufferSize = 256;
 		if(params.sampleRate === undefined) params.sampleRate = 25;
 
+		bufferSize = params.bufferSize; //ugly way of handling variables, but how to do better?
 		
 
 		iCanvasContext = iCanvas.getContext('2d');
@@ -79,9 +81,9 @@ pulsedetectr = {};
 
 		timer1 = new this.timer;
 		timer1.init();
-		fft = new FFT(params.bufferSize,params.sampleRate);
-		Values.t = new CBuffer(params.bufferSize);
-		Values.Y = new CBuffer(params.bufferSize);
+		
+		Values.t = [];
+		Values.Y = [];
 
 		myChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:1,timestampFormatter:SmoothieChart.timeFormatter});
 		myChart.streamTo(oChart,500);
@@ -100,21 +102,20 @@ pulsedetectr = {};
 		
 		timer1.printnreset();
 		HeadPos = forhead_extract();
-		green_process();
+		this.GrnAverage = green_process();
 		draw(HeadPos);
 
 		var timenow = new Date().getTime();
-		ppg_data.append(timenow, GrnAverage);
+		ppg_data.append(timenow, this.GrnAverage);
+
 		Values.t.push(timenow);
-		Values.Y.push(GrnAverage);
+		Values.Y.push(this.GrnAverage);
 
 
-/*	this.plotSpectrum = function(canvas){
-
-	//canvas.linechart(0,0,640,480,Values.)
-
-	}*/
-	
+		if(Values.t.length > bufferSize){
+			Values.t.shift();
+			Values.Y.shift();
+		}
 
 
 	}
@@ -122,9 +123,7 @@ pulsedetectr = {};
 	this.getpulse = function(){
 
 		if(this.initialised==true){
-		var bufferSize = Values.Y.length;
-
-
+		
 		//Linear interpolate values.
 		if(ppg_data.data.length < bufferSize){
 			buffer_full = false;
@@ -133,14 +132,14 @@ pulsedetectr = {};
 		else{
 			buffer_full = true;
 		//Linear interpolate values.
-			var tmp = lerp(Values.t.data,Values.Y.data);
+			var tmp = lerp(Values.t,Values.Y);
 			Values.even_t = tmp.X;
 			Values.even_Y = tmp.Y;
 			Values.mean = tmp.mean;
 
 		
 
-			fft.SAMPLERATE = (Values.t.data[bufferSize-1]-Values.t.data[0])/bufferSize;
+			var SAMPLERATE = Math.round((Values.t[bufferSize-1]-Values.t[0])/bufferSize);
 
 			Values.Ylessmean = [];
 
@@ -149,9 +148,17 @@ pulsedetectr = {};
 			}
 			
 			//Run FFT
-			Values.Spectrum = fft.forward(Values.Ylessmean);
+
+			rfft = new RFFT(bufferSize,SAMPLERATE);
+			rfft.forward(Values.Ylessmean);
+			Values.Spectrum = rfft.spectum;
 
 			//Now need to plot spectum!!!
+			//Plot something!!!
+			spectrumCanvas.clear();
+			spectrumCanvas.linechart(0,0,320,140,Values.even_t,Values.even_Y,{axis:'0 0 1 1'});
+			spectrumCanvas.text(160, 10, "This is where the spectrum plot should go!");
+
 		}
 
 	}
@@ -219,15 +226,17 @@ pulsedetectr = {};
 			GrnSum += dst[i+1];						
 		}
 		
-		GrnAverage = Math.round(GrnSum/GreenChannelFH.length);
 		FH_image.data = dst;
+		return Math.round(GrnSum/GreenChannelFH.length);
+		
 	}
 
 	var draw = function(hp){
-		oCanvasContext.clearRect(0,0,640,480);
+		oCanvasContext.clearRect(0,0,320,240);
 
 		oCanvasContext.putImageData(Head_Image,hp.subimgX,hp.subimgY); /*Place sub image of head on canvas*/
-		oCanvasContext.putImageData(FH_image,10,10); /*Place sub image of forehead in corner of the canvas*/
+		
+		oCanvasContext.putImageData(FH_image,hp.ForeHead_X,hp.ForeHead_Y); /*Place sub image of forehead in corner of the canvas*/
 
 				//Draw Rectangle around forehead.
 		oCanvas2Context.strokeStyle = "#00CC00";
