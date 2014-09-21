@@ -1,0 +1,498 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"o",
+				"oCanvas"
+			],
+			[
+				"oCa",
+				"oCanvasContext"
+			],
+			[
+				"eve",
+				"even_Y"
+			],
+			[
+				"ev",
+				"even_t"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"spe",
+				"spectrumCanvas"
+			],
+			[
+				"data",
+				"data"
+			],
+			[
+				"Grn",
+				"GrnAverage"
+			],
+			[
+				"char",
+				"chartCanvas"
+			],
+			[
+				"oCan",
+				"oChartCanvasCtx"
+			],
+			[
+				"b",
+				"bufferSize"
+			],
+			[
+				"oC",
+				"oChartCanvasCtx"
+			],
+			[
+				"Hea",
+				"HeadPos"
+			],
+			[
+				"head",
+				"head_pos"
+			],
+			[
+				"can",
+				"canvasOverlay"
+			],
+			[
+				"test",
+				"testOverlay"
+			],
+			[
+				"cana",
+				"canvasInput"
+			],
+			[
+				"Gr",
+				"GrnAverage"
+			],
+			[
+				"F",
+				"ForeHead_h"
+			],
+			[
+				"For",
+				"ForeHead_Y"
+			],
+			[
+				"Fore",
+				"ForeHead_X"
+			],
+			[
+				"Fo",
+				"ForeHead_w"
+			],
+			[
+				"ForeHead",
+				"ForeHead_h"
+			],
+			[
+				"fh",
+				"fh_u"
+			],
+			[
+				"subim",
+				"subimgY"
+			],
+			[
+				"su",
+				"subimgy"
+			],
+			[
+				"sub",
+				"subimgx"
+			],
+			[
+				"sum",
+				"subImage"
+			],
+			[
+				"testO",
+				"testOverlayContext"
+			],
+			[
+				"inp",
+				"inputContext"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 5845,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "js/pulsedetectr.js",
+			"settings":
+			{
+				"buffer_size": 7899,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "js/dsp.js",
+			"settings":
+			{
+				"buffer_size": 66759,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 215.0,
+		"selected_items":
+		[
+			[
+				"web i",
+				"Web Inspector"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
+			]
+		],
+		"width": 624.0
+	},
+	"console":
+	{
+		"height": 175.0,
+		"history":
+		[
+			"1/0.040",
+			"1/.",
+			"1/(.1*.040)",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"where",
+			"dir",
+			"git clone git://github.com/sokolovstas/SublimeWebInspector.git -b ST3 Web\\ Inspector",
+			"cd",
+			"cd ..",
+			"install",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"Package Control: Install Package",
+			"Package Control",
+			"install",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/RMB/Drive/GuidedTrack/darkruby501.github.io/js/g.line-min.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/GuidedTrackRMB/heart-rate/index.html",
+		"/C/Users/RMB/Drive/GuidedTrack/darkruby501.github.io/js/headtrackr.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/FaceTrackingHtml/facetracking.html",
+		"/C/Users/RMB/Drive/GuidedTrack/Server/darkruby501.github.io/darkruby501.github.io/js/pulsedetectr.js",
+		"/C/Users/RMB/Drive/GuidedTrack/Server/darkruby501.github.io/darkruby501.github.io/index.html",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/darkruby501.github.io/js/Chart.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/darkruby501.github.io/js/cbuffer.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/darkruby501.github.io/js/pulsedetectr.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/darkruby501.github.io/index.html",
+		"/C/Users/RMB/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/RMB/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/index.html",
+		"/C/Users/RMB/Google Drive/GuidedTrack/canvas-video-effects/image-worker.js",
+		"/C/Users/RMB/Google Drive/GuidedTrack/canvas-video-effects/index.html",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/js/cbuffer.js",
+		"/C/Users/RMB/Documents/GitHub/cbuffer/test/index.html",
+		"/C/Users/RMB/AppData/Roaming/Sublime Text 3/Packages/Web Inspector 3/swi.sublime-settings",
+		"/C/Users/RMB/Google Drive/GuidedTrack/Server/image-worker.js",
+		"/C/Users/RMB/AppData/Roaming/Sublime Text 3/Packages/User/swi.sublime-settings",
+		"/C/Program Files/Sublime Text 3/Packages/Scala.sublime-package",
+		"/C/Program Files/Sublime Text 3/Packages/Pascal.sublime-package",
+		"/C/Users/RMB/AppData/Local/Google/Chrome/User Data/Default/Preferences",
+		"/C/Program Files/Sublime Text 3/Packages/Package Control.sublime-package",
+		"/C/Program Files/Sublime Text 3/Packages/Lisp.sublime-package",
+		"/C/Program Files/Sublime Text 3/Packages/R.sublime-package",
+		"/C/Program Files/Sublime Text 3/Packages/Batch File.sublime-package",
+		"/C/Program Files/Sublime Text 3/Packages/Rails.sublime-package"
+	],
+	"find":
+	{
+		"height": 50.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"hamming",
+			"params.bufferSize",
+			"get_subface_means",
+			"get_subface_coord",
+			"480",
+			"640",
+			"100",
+			"320",
+			"240",
+			"320",
+			"currentDet",
+			"doVJDetection",
+			"CS",
+			"detectionInterval",
+			"updateP",
+			"oChartCanvas",
+			"240",
+			"320",
+			"240",
+			"320",
+			"<!",
+			"320",
+			"240",
+			"320",
+			"inputContext",
+			"debugOver",
+			"messagep",
+			"headtrackerMessage",
+			"faceObj",
+			"debugContext",
+			"canvasInput",
+			"gUMMessage",
+			"headtrackrStatus"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"bufferSize",
+			"240",
+			"320",
+			"640",
+			"480",
+			"640",
+			"480",
+			"640",
+			"480",
+			"640",
+			"480",
+			"640",
+			"event",
+			"testOverlayContext"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5845,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1761,
+								1761
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 726.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/pulsedetectr.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7899,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1791,
+								1791
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1209.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/dsp.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 66759,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12815,
+								12816
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8910.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 148.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "",
+	"replace":
+	{
+		"height": 94.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 401.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

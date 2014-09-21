@@ -29,11 +29,15 @@ Headtrackr library has this at the beginning - I do not yet understand why . . .
 
 //Need to fix hardcoding of video size (one variable in index file + argument checking in libraries?)
 //At least change so that forehead capture rotates with head.
-//Likely need to move to solely face recognition, no object tracking.
+//Possibly need to move to solely face recognition, no object tracking.
+//Get rotated head for capture.
 
 
 
  (function(){
+//Refine FFT (e.g. set up windowing)
+//Smooth outputw e.g. WMA?
+
 
 
 pulsedetectr = {};
@@ -47,10 +51,10 @@ pulsedetectr = {};
 
 	var iCanvasContext, oCanvasContext, oCanvas2Context,oChartCanvasCtx; //uneeded variable here . . .
 
-//Okay, R eally gotta tidy these variables!!!!
+//Okay, Really gotta tidy these variables!!!!
 
 	var start = Date.now(); //used to get timing info
-	var rfft = {};
+	var fft = {};
 	var Values = {};
 	var myChart = {};
 	var Head_Image = {};
@@ -62,8 +66,7 @@ pulsedetectr = {};
 	this.initialised = false;	
 	this.GrnAverage;
 
-			
-	
+/**/
 	
 	this.init = function(iCanvas,oCanvas,oCanvas2,oChart,params){
 		if (!params) params = {};
@@ -71,13 +74,17 @@ pulsedetectr = {};
 		if(params.bufferSize === undefined) params.bufferSize = 256;
 		if(params.sampleRate === undefined) params.sampleRate = 25;
 
-		bufferSize = params.bufferSize; //ugly way of handling variables, but how to do better?
+		bufferSize = params.bufferSize + 1; //ugly way of handling variables, but how to do better?
 		
 
 		iCanvasContext = iCanvas.getContext('2d');
 		oCanvasContext = oCanvas.getContext('2d');
 		oCanvas2Context = oCanvas2.getContext('2d');
 		//oChartCanvasCtx = oChart.getContext('2d');
+		// oCanvasContext.fillStyle = 'white';
+		// oCanvasContext.font="20px Georgia";
+		// oCanvasContext.fillText("PPG Pulse Wave",100,20)
+
 
 		timer1 = new this.timer;
 		timer1.init();
@@ -90,6 +97,9 @@ pulsedetectr = {};
 
 		ppg_data = new TimeSeries();
 		myChart.addTimeSeries(ppg_data, {lineWidth:2,strokeStyle:'#00ff00'})
+
+		var messagep = document.getElementById('BufferSize');
+		messagep.innerHTML = bufferSize - 1;
 
 		this.initialised = true;
 	}
@@ -109,7 +119,7 @@ pulsedetectr = {};
 		ppg_data.append(timenow, this.GrnAverage);
 
 		Values.t.push(timenow);
-		Values.Y.push(this.GrnAverage);
+		Values.Y.push(Math.round(this.GrnAverage));
 
 
 		if(Values.t.length > bufferSize){
@@ -124,58 +134,115 @@ pulsedetectr = {};
 
 		if(this.initialised==true){
 		
-		//Linear interpolate values.
-		if(ppg_data.data.length < bufferSize){
-			buffer_full = false;
-			return;
-		}
-		else{
-			buffer_full = true;
-		//Linear interpolate values.
-			var tmp = lerp(Values.t,Values.Y);
-			Values.even_t = tmp.X;
-			Values.even_Y = tmp.Y;
-			Values.mean = tmp.mean;
-
-		
-
-			var SAMPLERATE = Math.round((Values.t[bufferSize-1]-Values.t[0])/bufferSize);
-
-			Values.Ylessmean = [];
-
-			for(var i=0;i<bufferSize;i++){
-			Values.Ylessmean[i] = Values.even_Y[i] - Values.mean; 
+			//Linear interpolate values.
+			if(Values.t.length < bufferSize){//if(ppg_data.data.length < bufferSize){
+				buffer_full = false;
+				return;
 			}
+			else{
+				buffer_full = true;
+			//Linear interpolate values.
+				var tmp = lerp(Values.t,Values.Y);
+				Values.even_t = tmp.X;
+				Values.even_Y = tmp.Y;
+				Values.mean = tmp.mean;
+
 			
-			//Run FFT
 
-			rfft = new RFFT(bufferSize,SAMPLERATE);
-			rfft.forward(Values.Ylessmean);
-			Values.Spectrum = rfft.spectum;
+				var SAMPLERATE = Math.round(1000*bufferSize/(Values.t[bufferSize-1]-Values.t[0]));
+				console.log("SAMPLERATE = %d, Time to Fill Buffer = %d",SAMPLERATE,(Values.t[bufferSize-1]-Values.t[0]));
+				var BufferFillTime = Values.t[bufferSize-1]-Values.t[0];
 
-			//Now need to plot spectum!!!
-			//Plot something!!!
-			spectrumCanvas.clear();
-			spectrumCanvas.linechart(0,0,320,140,Values.even_t,Values.even_Y,{axis:'0 0 1 1'});
-			spectrumCanvas.text(160, 10, "This is where the spectrum plot should go!");
+				Values.Ylessmean = [];
+
+				for(var i=0;i<bufferSize-1;i++){
+				Values.Ylessmean[i] = Values.even_Y[i] - Values.mean; 
+				}
+				
+				//Run FFT
+
+				fft = new FFT(bufferSize-1,SAMPLERATE);
+				fft.forward(Values.Ylessmean);
+				Values.Spectrum = Array.prototype.slice.call(fft.spectrum); //Converts Float32Array to Array.
+
+				Values.f = [];
+
+				var lower_f = 0.8;
+				var upper_f = 2;
+				var lower_idx, upper_idx;
+
+				
+				//Get frequencies for spectrogram.
+				//find indices of lower and upper bound frequency range
+				//Lower = 45bpm = 0.75Hz, Upper = 120bpm = 2Hz (assume for now that people are at resting heart rate).
+
+				for (var i=0;i<fft.spectrum.length;i++){
+					Values.f[i] = fft.getBandFrequency(i);
+
+					if((lower_idx == undefined) && (Values.f[i]> lower_f)){
+						lower_idx = i-1;
+					}
+
+					if((upper_idx == undefined) && (Values.f[i]> upper_f)){
+						upper_idx = i;
+					}
+
+				}
+
+				//Slice to get section of interest!
+				var spectrum_subset = Values.Spectrum.slice(lower_idx,upper_idx);
+				var frequency_subset = Values.f.slice(lower_idx,upper_idx);
+
+				// Find peak!
+				var peak_idx = 0;
+				var peak_value = spectrum_subset[0];
+				for (var i = 1; i < spectrum_subset.length; i++){				
+					if(spectrum_subset[i] > peak_value){
+						peak_value = spectrum_subset[i];
+						peak_idx = i;
+					}
+
+				}
+
+				this.BPM = Math.round(frequency_subset[peak_idx]*60);
+
+				//Now need to plot spectum!!!
+				
+				spectrumCanvas.clear();
+				spectrumCanvas.linechart(0,0,300,220,frequency_subset,spectrum_subset,{axis:'0 0 1 1',shade:true});
+				// spectrumCanvas.linechart(0,0,620,300,Values.f,Values.Spectrum,{axis:'0 0 1 1',shade:true});
+				//spectrumCanvas.linechart(0,0,620,300,Values.even_t,Values.even_Y,{axis:'0 0 1 1',shade:true});
+				spectrumCanvas.text(160, 10, "Photoplethysmogram Pulse Wave Spectrogram");
+
+				
+				this.getpulse.updateMessages = function(){
+
+					var messagep = document.getElementById('SampleRate');
+					messagep.innerHTML = SAMPLERATE;
+					var messagep = document.getElementById('BufferFillTime');
+					messagep.innerHTML = BufferFillTime;
+
+					var BPMres = Math.round(1000*60/BufferFillTime);
+					var messagep = document.getElementById('BPMres');
+					messagep.innerHTML = BPMres;
+
+					var messagep = document.getElementById('HeartRateBPM');
+					messagep.innerHTML = pdetector.BPM + " \u00B1 " + BPMres/2;
+
+
+				}
+
+				this.getpulse.updateMessages();
+			}
 
 		}
+	}	
 
-	}
-}	
-
-
-
-
-	// this.updatePlot = function(){
-
-
-	// 	myChart.datasets[0].data = cbuffer.data;
-	// 	myChart.update();
-	// }
 	
 
-	forhead_extract = function(){
+	
+
+	var forhead_extract = function(){
 
 		head_pos = {};
 
@@ -217,7 +284,7 @@ pulsedetectr = {};
 		var dst = FH_image.data;
 		var GreenChannelFH = [];
 		var GrnSum = 0;
-		/* Image Processing goes here */
+		/* Image Processing goes here*/
 		for (var i=0; i < dst.length; i += 4) {
 			dst[i+0] = 0;
 			dst[i+2] = 0;
@@ -235,8 +302,10 @@ pulsedetectr = {};
 		oCanvasContext.clearRect(0,0,320,240);
 
 		oCanvasContext.putImageData(Head_Image,hp.subimgX,hp.subimgY); /*Place sub image of head on canvas*/
-		
 		oCanvasContext.putImageData(FH_image,hp.ForeHead_X,hp.ForeHead_Y); /*Place sub image of forehead in corner of the canvas*/
+		// oCanvasContext.fillStyle = 'white';
+		// oCanvasContext.font="20px Georgia";
+		// oCanvasContext.fillText("PPG Pulse Wave",100,20)
 
 				//Draw Rectangle around forehead.
 		oCanvas2Context.strokeStyle = "#00CC00";
@@ -311,7 +380,7 @@ function lerp(x,y){
  	*/
  	
  	if (x.length != y.length){
- 		console.error("lerp vectors are not of same size!")
+ 		console.error("lerp vectors are not of same size!");
  	}
  	
  	var Interp = {};
@@ -323,11 +392,13 @@ function lerp(x,y){
  	Interp.Y = [];
 
  	for (var i = 0; i < N-1; i++){
- 		Interp.Y[i] = y[i] + (y[i+1]-y[i])*((Interp.X[i]-x[i])/(x[i+1]-x[i]));
+ 		Interp.Y[i] = y[i] + (Interp.X[i]-x[i])*((y[i+1]-y[i])/(x[i+1]-x[i]));
  		sum += Interp.Y[i];
   	}
 
-  	Interp.mean = Math.round(sum/N);
+  	///MEAN IS WRONG - MISSING LAST ELEMENT
+
+  	Interp.mean = Math.round(sum/N-1);
 
   	return Interp;
 
@@ -349,7 +420,15 @@ function lerp(x,y){
 
 }
 
-
+function argmax(array){
+	var index_max = 0;
+	for(var i=1; i < array.length; i++){
+		if(array[index_max]<array[i]){
+			index_max = i;
+		}
+	}
+	return index_max;
+}
 
 
 

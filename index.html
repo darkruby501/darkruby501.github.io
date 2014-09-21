@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>Javascript Webcam Pulse Detector</title>
+		<title>PPG Webcam Pulse Detector</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<meta charset="utf-8">
 		<style>
@@ -26,29 +26,39 @@
 		<script src="./js/g.raphael-min.js"></script>
 		<script src="./js/g.line-min.js"></script>
 
+<!-- 	   <h2 style="font-family:lucida console">Photoplethysmogram Webcam Pulse Detector</h2>
+ -->
 
 		<canvas id="compare" width="320" height="240" style="display:none"></canvas>
 		<video id="vid" autoplay loop width="320" height="240"></video>
 		<canvas id="overlay" width="320" height="240"></canvas>
+		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
 		<canvas id="debug" width="320" height="240"></canvas>
 		<canvas id="chart" width="320" height="80"></canvas> <!-- For real-time plot-->
 	<!-- 	<canvas id="spectrum" width="320" height="240"></canvas> -->
  	
 
-		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
 
 
+		<p style="font-weight: bold;">Heart Rate : <span id='HeartRateBPM'></span> bpm</p>
 		<p id='gUMMessage'></p>
 		<p>Status : <span id='headtrackerMessage'></span></p>
-		<p>Average Green Channel Value on Forehead : <span id='GrnAverageValue'></span></p>
+		<p>Mean Green on Forehead : <span id='GrnAverageValue'></span></p>
+		<p>Buffer Size : <span id='BufferSize'></span></p>
+		<p>Sample Rate : <span id='SampleRate'></span> Hz</p>
+		<p>Buffer Fill Time: <span id='BufferFillTime'></span> ms</p>
+		<p>Resolution : <span id='BPMres'></span> bpm</p>
+		
+
+
 		<p><input type="button" onclick="htracker.stop();htracker.start();" value="reinitiate facedetection"></input>
 		<br/><br/>
-		<input type="checkbox" onclick="showProbabilityCanvas()" value="asdfasd"></input>Show probability-map</p>
+	
 	
 		
 		<script>
 		  // set up video and canvas elements needed
-			var spectrumCanvas = Raphael(325, 0, 320, 150);
+			var spectrumCanvas = Raphael(325, 320, 320, 240);
 
 			//var spectrumCanvas = document.getElementById('spectrum');
 			var videoInput = document.getElementById('vid');
@@ -103,7 +113,7 @@
 			
 			// the face tracking setup
 			
-			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 50});
+			var htracker = new headtrackr.Tracker({altVideo : {ogv : "./media/capture5.ogv", mp4 : "./media/capture5.mp4"}, calcAngles : true, ui : false, headPosition : false, debug : debugOverlay, detectionInterval : 20});
 			htracker.init(videoInput, canvasInput);
 			htracker.start();
 
@@ -139,10 +149,8 @@
 			});
 
 			setInterval(function(){ 
-				if(pdetector.initialised==true){
-						pdetector.getpulse()
-					}
-				}, 500); 
+				if(pdetector.initialised==true){pdetector.getpulse()}
+				}, 1000); 
 
 				//	pdetector.plotSpectrum(spectrumCanvas)
 			
