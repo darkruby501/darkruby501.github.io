@@ -180,7 +180,7 @@ pulsedetectr = {};
 					Values.f[i] = fft.getBandFrequency(i);
 
 					if((lower_idx == undefined) && (Values.f[i]> lower_f)){
-						lower_idx = i-1;
+						lower_idx = i;
 					}
 
 					if((upper_idx == undefined) && (Values.f[i]> upper_f)){
