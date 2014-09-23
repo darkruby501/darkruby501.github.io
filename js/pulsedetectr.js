@@ -201,10 +201,12 @@ pulsedetectr = {};
 						peak_value = spectrum_subset[i];
 						peak_idx = i;
 					}
-
+					frequency_subset[i] = Math.round(frequency_subset[i]*60);
 				}
 
-				this.BPM = Math.round(frequency_subset[peak_idx]*60);
+				frequency_subset[0] = Math.round(frequency_subset[0]*60)
+
+				this.BPM = frequency_subset[peak_idx]; //Math.round(frequency_subset[peak_idx]*60);
 
 				//Now need to plot spectum!!!
 				
@@ -227,7 +229,7 @@ pulsedetectr = {};
 					messagep.innerHTML = BPMres;
 
 					var messagep = document.getElementById('HeartRateBPM');
-					messagep.innerHTML = pdetector.BPM + " \u00B1 " + BPMres/2;
+					messagep.innerHTML = '[' + (pdetector.BPM - BPMres/2) + '-' + (pdetector.BPM + BPMres/2) + ']' //pdetector.BPM + " \u00B1 " + BPMres/2;
 
 
 				}

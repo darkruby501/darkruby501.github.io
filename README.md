@@ -21,3 +21,11 @@ To-Do:
 - Refine FFT (windowing, etc.)
 - Apply smoothing to output? WMA?
 - Tidy variables.
+
+Potential Ways to Boost Accuracy:
+- Windowing on FFT
+- Filtering of Pulse Wave (band pass?).
+- Smoothing of Output (discard outliers)
+- Button to flush buffer
+- Automatically flush buffer when large movement detected
+- Green background!
