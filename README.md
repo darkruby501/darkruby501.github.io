@@ -27,5 +27,11 @@ Potential Ways to Boost Accuracy:
 - Filtering of Pulse Wave (band pass?).
 - Smoothing of Output (discard outliers)
 - Button to flush buffer
-- Automatically flush buffer when large movement detected
+- Automatically flush buffer when large movement detected (or rectange grows enormously in size)
 - Green background!
+- ICA: Of course, how could I forget that one!
+- Only accept value if one distinct peak?
+- Checks for when rectangle isn't completely on forehead? Outlier pixel values?
+
+Notes:
+- Does the processing and pixel capture need to be linked to the head tracking? Seemingly not. Better to use head tracking to update position, and then separate periodic timer to do heart rate analysis. This modularity also allows for different ways of getting the forehead location, e.g. "locate and lock" as in the Python package.
