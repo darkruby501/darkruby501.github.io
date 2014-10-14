@@ -57,29 +57,32 @@ pulsedetectr = {};
 	var fft = {};
 	var Values = {};
 	var myChart = {};
+	var myHRChart = {};
 	var Head_Image = {};
 	var FH_image = {};
 	var HeadPos = {};
 	var ppg_data = {};
 	var bufferSize;
+	var FFTwindow;
 	
 	this.initialised = false;	
 	this.GrnAverage;
+	this.event = {};
 
 /**/
 	
-	this.init = function(iCanvas,oCanvas,oCanvas2,oChart,params){
+	this.init = function(params){ //Okay, I have to create a canvases object. params.CanvasBag
 		if (!params) params = {};
 
 		if(params.bufferSize === undefined) params.bufferSize = 256;
-		if(params.sampleRate === undefined) params.sampleRate = 25;
+		
 
 		bufferSize = params.bufferSize + 1; //ugly way of handling variables, but how to do better?
 		
 
-		iCanvasContext = iCanvas.getContext('2d');
-		oCanvasContext = oCanvas.getContext('2d');
-		oCanvas2Context = oCanvas2.getContext('2d');
+		iCanvasContext = params.CanvasBag.iCanvas.getContext('2d');
+		oCanvasContext = params.CanvasBag.oCanvas.getContext('2d');
+		oCanvas2Context = params.CanvasBag.oCanvas2.getContext('2d');
 		//oChartCanvasCtx = oChart.getContext('2d');
 		// oCanvasContext.fillStyle = 'white';
 		// oCanvasContext.font="20px Georgia";
@@ -92,11 +95,18 @@ pulsedetectr = {};
 		Values.t = [];
 		Values.Y = [];
 
-		myChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:1,timestampFormatter:SmoothieChart.timeFormatter});
-		myChart.streamTo(oChart,500);
-
+		myChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:0.5});
+		myChart.streamTo(params.CanvasBag.oChart,500);
 		ppg_data = new TimeSeries();
 		myChart.addTimeSeries(ppg_data, {lineWidth:2,strokeStyle:'#00ff00'})
+
+		myHeartChart = new SmoothieChart({millisPerPixel:38,interpolation:'bezier',scaleSmoothing:1,minValue:60,maxValue:100});
+		myHeartChart.streamTo(params.CanvasBag.oHeart,500);
+		bpm_data = new TimeSeries();
+		myHeartChart.addTimeSeries(bpm_data, {lineWidth:2,strokeStyle:'#ff0000'})
+
+
+		FFTwindow = new WindowFunction(DSP.HANN);
 
 		var messagep = document.getElementById('BufferSize');
 		messagep.innerHTML = bufferSize - 1;
@@ -105,15 +115,17 @@ pulsedetectr = {};
 	}
 
 
-	this.run = function(event){
+	this.run = function(){
+
+    if(this.event.x !== undefined){
 
 		var processed = {};
 		var buffer_full = false;
 		
 		timer1.printnreset();
-		HeadPos = forhead_extract();
+		HeadPos = forhead_extract(this.event);
 		this.GrnAverage = green_process();
-		draw(HeadPos);
+		draw(HeadPos, this.event);
 
 		var timenow = new Date().getTime();
 		ppg_data.append(timenow, this.GrnAverage);
@@ -122,13 +134,15 @@ pulsedetectr = {};
 		Values.Y.push(Math.round(this.GrnAverage));
 
 
-		if(Values.t.length > bufferSize){
+		if(Values.t.length > bufferSize){ //Will need to modify for dynamic buffer size.
 			Values.t.shift();
 			Values.Y.shift();
 		}
 
+	}
 
 	}
+
 
 	this.getpulse = function(){
 
@@ -160,12 +174,19 @@ pulsedetectr = {};
 				}
 				
 				//Run FFT
-
 				fft = new FFT(bufferSize-1,SAMPLERATE);
-				fft.forward(Values.Ylessmean);
+
+
+				 Values.Windowed = FFTwindow.process(Values.Ylessmean);
+				// fft.forward(Values.Windowed);
+				// Values.SpectrumWindowed = Array.	prototype.slice.call(fft.spectrum);
+
+
+				fft.forward(Values.Windowed); //	fft.forward(Values.Ylessmean);
 				Values.Spectrum = Array.prototype.slice.call(fft.spectrum); //Converts Float32Array to Array.
 
-				Values.f = [];
+
+				Values.f = []; //Okay, I gotta stick this all in a function.
 
 				var lower_f = 0.8;
 				var upper_f = 2;
@@ -208,10 +229,13 @@ pulsedetectr = {};
 
 				this.BPM = frequency_subset[peak_idx]; //Math.round(frequency_subset[peak_idx]*60);
 
+				var timenow = new Date().getTime();
+				bpm_data.append(timenow, this.BPM);
+
 				//Now need to plot spectum!!!
 				
 				spectrumCanvas.clear();
-				spectrumCanvas.linechart(0,0,300,220,frequency_subset,spectrum_subset,{axis:'0 0 1 1',shade:true});
+				spectrumCanvas.linechart(20,0,320,220,frequency_subset,spectrum_subset,{axis:'0 0 1 1',shade:true});
 				// spectrumCanvas.linechart(0,0,620,300,Values.f,Values.Spectrum,{axis:'0 0 1 1',shade:true});
 				//spectrumCanvas.linechart(0,0,620,300,Values.even_t,Values.even_Y,{axis:'0 0 1 1',shade:true});
 				spectrumCanvas.text(160, 10, "Photoplethysmogram Pulse Wave Spectrogram");
@@ -241,12 +265,30 @@ pulsedetectr = {};
 	}	
 
 	
+	this.reset = function(){
+		Values.t = [];
+		Values.Y = [];
+		buffer_full = false;
+		
+		var messagep = document.getElementById('SampleRate');
+		messagep.innerHTML = '';
+		var messagep = document.getElementById('BufferFillTime');
+		messagep.innerHTML = '';
+		var messagep = document.getElementById('HeartRateBPM');
+		messagep.innerHTML = ''; 
+		var messagep = document.getElementById('BPMres');
+		messagep.innerHTML = '';
 
+
+	}
 	
+	this.set_event = function(event_data){
+		this.event = event_data;
+	}
 
-	var forhead_extract = function(){
+	var forhead_extract = function(event){
 
-		head_pos = {};
+		var head_pos = {};
 
 		// x,y for centre; X,Y for top corner
 
@@ -300,8 +342,10 @@ pulsedetectr = {};
 		
 	}
 
-	var draw = function(hp){
+	var draw = function(hp,event){
 		oCanvasContext.clearRect(0,0,320,240);
+		oCanvas2Context.clearRect(0,0,320,240);
+
 
 		oCanvasContext.putImageData(Head_Image,hp.subimgX,hp.subimgY); /*Place sub image of head on canvas*/
 		oCanvasContext.putImageData(FH_image,hp.ForeHead_X,hp.ForeHead_Y); /*Place sub image of forehead in corner of the canvas*/
@@ -315,6 +359,14 @@ pulsedetectr = {};
 
 		oCanvasContext.strokeStyle = "#00CC00";
 		oCanvasContext.strokeRect(hp.ForeHead_X,hp.ForeHead_Y,hp.ForeHead_w,hp.ForeHead_h);
+
+		oCanvas2Context.translate(event.x, event.y);
+		oCanvas2Context.rotate(event.angle-(Math.PI/2));
+		oCanvas2Context.strokeStyle = "#CC0000";//"#00CC00";
+		oCanvas2Context.strokeRect((-(event.width/2)) >> 0, (-(event.height/2)) >> 0, event.width, event.height);
+		oCanvas2Context.rotate((Math.PI/2)-event.angle);
+		oCanvas2Context.translate(-event.x, -event.y);
+
 
 	}
 

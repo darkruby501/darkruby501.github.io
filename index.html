@@ -35,6 +35,7 @@
 		<canvas id="test_canvas" width=320 height=240></canvas> <!-- New canvas for testing	 -->
 		<canvas id="debug" width="320" height="240"></canvas>
 		<canvas id="chart" width="320" height="80"></canvas> <!-- For real-time plot-->
+		<canvas id="heartrate" width="320" height="80"></canvas> <!-- For real-time plot-->
 	<!-- 	<canvas id="spectrum" width="320" height="240"></canvas> -->
  	
 
@@ -51,14 +52,14 @@
 		
 
 
-		<p><input type="button" onclick="htracker.stop();htracker.start();" value="reinitiate facedetection"></input>
+		<p><input type="button" onclick="htracker.stop();htracker.start();pdetector.reset();" value="reinitiate"></input>
 		<br/><br/>
 	
 	
 		
 		<script>
 		  // set up video and canvas elements needed
-			var spectrumCanvas = Raphael(325, 320, 320, 240);
+			var spectrumCanvas = Raphael(325, 320, 325, 240);
 
 			//var spectrumCanvas = document.getElementById('spectrum');
 			var videoInput = document.getElementById('vid');
@@ -66,6 +67,7 @@
 			var canvasOverlay = document.getElementById('overlay');
 			var debugOverlay = document.getElementById('debug');
 			var chartCanvas = document.getElementById('chart');
+			var heartCanvas = document.getElementById('heartrate'); 
 			var overlayContext = canvasOverlay.getContext('2d');
 			/*var inputContext = canvasInput.getContext('2d'); //added to access video canvas*/
 
@@ -119,7 +121,7 @@
 
 
 			var pdetector = new pulsedetectr.Detector();
-			pdetector.init(canvasInput,testOverlay,canvasOverlay,chartCanvas,{bufferSize: 256});
+			pdetector.init({CanvasBag: {iCanvas:canvasInput, oCanvas: testOverlay, oCanvas2: canvasOverlay, oChart: chartCanvas, oHeart: heartCanvas}, bufferSize: 128});
 
 
 			
@@ -127,42 +129,36 @@
 			
 			document.addEventListener("facetrackingEvent", function( event ) {
 				// clear canvas
-				overlayContext.clearRect(0,0,320,240);
+				// overlayContext.clearRect(0,0,320,240);
 
 
 				// once we have stable tracking, draw rectangle
 				if (event.detection == "CS") {
-					overlayContext.translate(event.x, event.y);
-					overlayContext.rotate(event.angle-(Math.PI/2));
-					overlayContext.strokeStyle = "#CC0000";//"#00CC00";
-					overlayContext.strokeRect((-(event.width/2)) >> 0, (-(event.height/2)) >> 0, event.width, event.height);
-					overlayContext.rotate((Math.PI/2)-event.angle);
-					overlayContext.translate(-event.x, -event.y);
-					
 
-					pdetector.run(event);
 
 					
-					var messagep = document.getElementById('GrnAverageValue');
-					messagep.innerHTML = pdetector.GrnAverage;
+					pdetector.set_event(event);
+					// pdetector.run(event);
+
+					
+					// var messagep = document.getElementById('GrnAverageValue');
+					// messagep.innerHTML = pdetector.GrnAverage;
 				}
 			});
 
+			
+			setInterval(function(){
+				pdetector.run();
+				var messagep = document.getElementById('GrnAverageValue');
+				messagep.innerHTML = pdetector.GrnAverage;
+				}, 20);
+
 			setInterval(function(){ 
 				if(pdetector.initialised==true){pdetector.getpulse()}
-				}, 1000); 
+				}, 500); 
 
 				//	pdetector.plotSpectrum(spectrumCanvas)
 			
-			// turn off or on the canvas showing probability
-			function showProbabilityCanvas() {
-				var debugCanvas = document.getElementById('debug');
-				if (debugCanvas.style.display == 'none') {
-					debugCanvas.style.display = 'block';
-				} else {
-					debugCanvas.style.display = 'none';
-				}
-			}
 		</script>
 	</body>
 </html>
